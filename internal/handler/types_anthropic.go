@@ -67,10 +67,9 @@ type ContentBlock struct {
 }
 
 type ImageSource struct {
-	Type      string `json:"type"`                 // "base64" or "url"
-	MediaType string `json:"media_type,omitempty"` // e.g. "image/png"
-	Data      string `json:"data,omitempty"`
-	URL       string `json:"url,omitempty"`
+	Type      string `json:"type"`       // "base64"
+	MediaType string `json:"media_type"` // e.g. "image/png"
+	Data      string `json:"data"`
 }
 
 // AnthropicTool defines a tool in the Anthropic format.

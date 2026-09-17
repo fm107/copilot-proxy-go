@@ -30,6 +30,12 @@ func (h *Handler) handleWithMessagesAPI(w http.ResponseWriter, r *http.Request, 
 		payload["model"] = req.Model
 	}
 
+	// Collapse the mutually exclusive max_tokens/max_completion_tokens pair.
+	// This handler forwards the client's JSON nearly untouched, so an extra
+	// max_completion_tokens from modern SDKs would ride along with max_tokens
+	// and Copilot rejects the request with 400.
+	normalizeTokenLimitFields(payload)
+
 	// Strip unsupported "scope" from cache_control (Claude Code 2.1.89+)
 	stripCacheControlScope(payload)
 

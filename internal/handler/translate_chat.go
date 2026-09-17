@@ -85,6 +85,12 @@ func translateToOpenAIWithModels(req *AnthropicRequest, extraPrompt string, mode
 		TopP:        req.TopP,
 	}
 
+	// Streaming responses carry no usage unless we opt in; ask for the final
+	// usage chunk so token metrics reach the dashboard.
+	if req.Stream {
+		ccReq.StreamOptions = &StreamOptions{IncludeUsage: true}
+	}
+
 	// Max tokens
 	maxTokens := req.MaxTokens
 	ccReq.MaxTokens = &maxTokens

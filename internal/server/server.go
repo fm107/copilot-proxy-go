@@ -74,7 +74,7 @@ func NewWithHandler(opts Options, endpoints *handler.Handler) *http.Server {
 
 	host := opts.Host
 	if host == "" {
-		host = "127.0.0.1"
+		host = "0.0.0.0"
 	}
 	addr := fmt.Sprintf("%s:%d", host, opts.Port)
 

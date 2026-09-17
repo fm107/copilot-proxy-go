@@ -30,6 +30,10 @@ func (h *Handler) Responses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Map max_completion_tokens onto max_output_tokens and drop it, so an
+	// OpenAI-SDK-shaped field never reaches Copilot's Responses endpoint.
+	normalizeResponsesTokenLimit(payload)
+
 	modelID, _ := payload["model"].(string)
 	if resolved := ResolveCopilotModel(modelID); resolved != modelID {
 		modelID = resolved

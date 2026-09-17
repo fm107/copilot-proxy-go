@@ -105,7 +105,7 @@ func startCmd() *cobra.Command {
 
 			listenHost := host
 			if listenHost == "" {
-				listenHost = "127.0.0.1"
+				listenHost = "0.0.0.0"
 			}
 			fmt.Println()
 			fmt.Printf("  Copilot API proxy is running on http://%s:%d\n", listenHost, port)
@@ -140,7 +140,7 @@ func startCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&host, "host", "127.0.0.1", "host/IP to bind to (use 0.0.0.0 for all interfaces)")
+	cmd.Flags().StringVar(&host, "host", "0.0.0.0", "host/IP to bind to (default 0.0.0.0 = all interfaces; use 127.0.0.1 to restrict to localhost)")
 	cmd.Flags().IntVarP(&port, "port", "p", 4141, "port to listen on")
 	cmd.Flags().StringVarP(&githubToken, "github-token", "g", "", "GitHub OAuth token (skips device code flow)")
 	cmd.Flags().StringVarP(&accountType, "account-type", "a", "individual", "Copilot account type: individual, business, enterprise")

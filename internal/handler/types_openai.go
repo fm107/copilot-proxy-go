@@ -3,15 +3,23 @@ package handler
 // --- Chat Completions Request (what we send to Copilot) ---
 
 type ChatCompletionRequest struct {
-	Model       string       `json:"model"`
-	Messages    []OpenAIMsg  `json:"messages"`
-	MaxTokens   *int         `json:"max_tokens,omitempty"`
-	Temperature *float64     `json:"temperature,omitempty"`
-	TopP        *float64     `json:"top_p,omitempty"`
-	Stream      bool         `json:"stream"`
-	Tools       []OpenAITool `json:"tools,omitempty"`
-	ToolChoice  any          `json:"tool_choice,omitempty"`
-	Stop        any          `json:"stop,omitempty"`
+	Model         string         `json:"model"`
+	Messages      []OpenAIMsg    `json:"messages"`
+	MaxTokens     *int           `json:"max_tokens,omitempty"`
+	StreamOptions *StreamOptions `json:"stream_options,omitempty"`
+	Temperature   *float64       `json:"temperature,omitempty"`
+	TopP          *float64       `json:"top_p,omitempty"`
+	Stream        bool           `json:"stream"`
+	Tools         []OpenAITool   `json:"tools,omitempty"`
+	ToolChoice    any            `json:"tool_choice,omitempty"`
+	Stop          any            `json:"stop,omitempty"`
+}
+
+// StreamOptions mirrors OpenAI's stream_options. IncludeUsage makes the
+// upstream append a final chunk carrying usage; without it streaming
+// responses report zero tokens to the dashboard.
+type StreamOptions struct {
+	IncludeUsage bool `json:"include_usage"`
 }
 
 type OpenAIMsg struct {

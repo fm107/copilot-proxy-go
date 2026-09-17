@@ -339,6 +339,37 @@ func ParseAndPatchChatCompletionWithModels(body io.Reader, models ModelFinder) (
 
 	isStream := parsed.Stream
 
+	// Normalize the mutually exclusive OpenAI token-limit parameters.
+	// Copilot's OpenAI-compatible endpoint (like OpenAI itself) rejects a
+	// request that sets both max_tokens and max_completion_tokens with
+	// 400 "max_tokens and max_completion_tokens cannot both be set".
+	// Newer clients (openai SDKs, ZCode, ...) send only max_completion_tokens;
+	// carry that value over to max_tokens (the field the rest of this proxy
+	// speaks) and drop the duplicate spelling. If the client set both,
+	// max_tokens wins. Either way exactly one field leaves this function.
+	if mct, ok := payload["max_completion_tokens"]; ok {
+		if parsed.MaxTokens == nil {
+			if v, isNum := mct.(float64); isNum && v > 0 {
+				payload["max_tokens"] = int(v)
+				n := int(v)
+				parsed.MaxTokens = &n // client set a limit: suppress auto-fill below
+			}
+		}
+		delete(payload, "max_completion_tokens")
+	}
+
+	// Streaming responses only carry usage when the client opts in via
+	// stream_options.include_usage. Force it so token metrics are captured
+	// for every stream, not just for clients that remember to ask.
+	if isStream {
+		so, _ := payload["stream_options"].(map[string]any)
+		if so == nil {
+			so = map[string]any{}
+			payload["stream_options"] = so
+		}
+		so["include_usage"] = true
+	}
+
 	// Auto-fill max_tokens from model capabilities if missing
 	if parsed.MaxTokens == nil {
 		if model := models.FindModel(parsed.Model); model != nil {
